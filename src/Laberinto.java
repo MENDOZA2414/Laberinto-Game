@@ -15,11 +15,13 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 public class Laberinto {
 	private JFrame frame;
-	public int player_x = 70;
-	public int player_y = 70;
+	public int player_x = 150;
+	public int player_y = 80;
 	public int last_prest;
 	private Rect r,p;
 	/**
@@ -42,6 +44,7 @@ public class Laberinto {
 	 */
 	public Laberinto() {
 		initialize();
+		
 	}
 
 	/**
@@ -50,14 +53,16 @@ public class Laberinto {
 
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 650, 530);
+		frame.setBounds(0, 0, 550, 680);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		
 		JPanel juego = new JPanel();
-		juego.setForeground(new Color(59, 255, 171));
+		juego.setBackground(new Color(69, 7, 134));
+		juego.setForeground(new Color(255, 255, 255));
 		frame.getContentPane().add(juego, BorderLayout.CENTER);
 		juego.add(new MyGraphics());
+		
 		juego.addKeyListener(new KeyListener() {
 
 			@Override
@@ -71,18 +76,19 @@ public class Laberinto {
 				
 				if(!r.colision(p)) {
 					if(last_prest == 87 && player_y > 15) {
-						player_y -=10;
+						player_y -=15;
 					}
-					if(last_prest == 83 && player_y < 385) {
-						player_y +=10;
+					if(last_prest == 83 && player_y < 650) {
+						player_y +=15;
 					}
 					if(last_prest == 68 && player_x < 575) {
-						player_x +=10;
+						player_x +=15;
 					}
 					if(last_prest == 65 && player_x > 25) {
-						player_x -=10;
+						player_x -=15;
 					}
 					juego.repaint();
+					
 				}
 				else
 				{
@@ -96,34 +102,44 @@ public class Laberinto {
 				
 			}
 		});
-		JPanel panel = new JPanel();
-		panel.setBackground(new Color(123, 238, 81));
-		frame.getContentPane().add(panel, BorderLayout.SOUTH);
-		
-		JButton btnNewButton = new JButton("Reiniciar");
-		btnNewButton.setFont(new Font("Marker Felt", Font.PLAIN, 15));
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				juego.setFocusable(true);
-				juego.requestFocus();
-			}
-		});
-		panel.add(btnNewButton);
 		
 		juego.setFocusable(true);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBackground(new Color(157, 247, 230));
-		frame.getContentPane().add(panel_1, BorderLayout.NORTH);
+		JPanel levelPanel = new JPanel();
+		levelPanel.setBackground(new Color(69, 7, 134));
+		frame.getContentPane().add(levelPanel, BorderLayout.NORTH);
+		levelPanel.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBackground(new Color(157, 247, 230));
-		frame.getContentPane().add(panel_2, BorderLayout.WEST);
+		JLabel levelText = new JLabel("  Level 1");
+		levelText.setForeground(new Color(255, 255, 255));
+		levelText.setHorizontalAlignment(SwingConstants.RIGHT);
+		levelText.setFont(new Font("Marker Felt", Font.PLAIN, 25));
+		levelPanel.add(levelText, BorderLayout.WEST);
 		
-		JPanel panel_3 = new JPanel();
-		panel_3.setBackground(new Color(157, 247, 230));
-		frame.getContentPane().add(panel_3, BorderLayout.EAST);
-		juego.requestFocus();
+		JPanel Espacio = new JPanel();
+		Espacio.setBackground(new Color(69, 7, 134));
+		levelPanel.add(Espacio, BorderLayout.NORTH);
+		
+		JButton btnOpciones = new JButton("-");
+		levelPanel.add(btnOpciones, BorderLayout.EAST);
+		btnOpciones.setFocusable(false);
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(118, 228, 84));
+		frame.getContentPane().add(panel, BorderLayout.SOUTH);
+		
+		JButton btnNewButton = new JButton("Reiniciar");
+		btnNewButton.setForeground(new Color(9, 11, 49));
+		btnNewButton.setFont(new Font("Marker Felt", Font.PLAIN, 20));
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				player_x = 150;
+				player_y = 80;
+				juego.setFocusable(true);
+				juego.requestFocus();
+				juego.repaint();
+			}
+		});
+		panel.add(btnNewButton);
 	}
 	
 	public class MyGraphics extends JComponent {
@@ -136,11 +152,15 @@ public class Laberinto {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 	        
-	        //player
-	        r = new Rect(player_x, player_y, 50, 50, new Color(0,0,0));
-	        g.setColor(r.c);
-	        g.fillRect(r.x,r.y, r.w, r.h); 
+	        //fondo
+			g.setColor(new Color(9,11,52));
+	        g.fillRect(120, 50, 400, 500); 
 	        
+	        //player
+	        r = new Rect(player_x, player_y, 30, 30, new Color(118,228,84));
+	        g.setColor(r.c);
+	        g.fillOval(r.x,r.y, r.w, r.h);
+	     
 	        p = new Rect(300, 60, 40, 200, new Color(100,30,20));
 	        g.setColor(p.c);
 	        g.fillRect(p.x,p.y, p.w, p.h); 
@@ -148,6 +168,7 @@ public class Laberinto {
 	        if(r.colision(p)) {
 	        	System.out.println(r.colision(p));
 	        }
+	        
 		}
 	}
 	
