@@ -1,7 +1,10 @@
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,13 +19,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.ImageIcon;
 
 public class Laberinto {
 	
 	private JFrame frame;
-	private JLabel tiempoNum = new JLabel("00:00:00:00");;
+	private JLabel tiempoNum = new JLabel("00:00:00");;
 	/* LABERINTO 1
 	private int tamaño = 25;
     private int ancho = 25;
@@ -41,6 +51,7 @@ public class Laberinto {
 	public int player_y = 20;
 	public int last_prest;
 	private Timer tiempo;
+	private  Clip clip;
 	
 	private int centecimas = 0, segundos = 0, minutos = 0, horas = 	0;
 	
@@ -60,19 +71,23 @@ public class Laberinto {
 	
 	public Laberinto() {
 		initialize();
-		
+		try {
+			sonido();
+		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void initialize() {
 		tiempo = new Timer(10,accion);
 		frame = new JFrame();
-		frame.setBounds(0, 0, 855, 680);
+		frame.setBounds(0, 0, 580, 750);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		
 		JPanel juego = new JPanel();
-		juego.setBackground(new Color(69, 7, 134));
-		juego.setForeground(new Color(255, 255, 255));
+		juego.setBackground(Color.BLACK);
 		frame.getContentPane().add(juego, BorderLayout.CENTER);
 		juego.add(new MyGraphics());
 		
@@ -125,42 +140,81 @@ public class Laberinto {
 		juego.setFocusable(true);
 		
 		JPanel levelPanel = new JPanel();
-		levelPanel.setBackground(new Color(69, 7, 134));
+		levelPanel.setBackground(Color.BLACK);
 		frame.getContentPane().add(levelPanel, BorderLayout.NORTH);
 		levelPanel.setLayout(new BorderLayout(0, 0));
 		
 		JLabel levelText = new JLabel("  Level 1");
-		levelText.setForeground(new Color(255, 255, 255));
+		levelText.setForeground(new Color(202, 14, 3));
 		levelText.setHorizontalAlignment(SwingConstants.RIGHT);
-		levelText.setFont(new Font("Marker Felt", Font.PLAIN, 25));
+		levelText.setFont(new Font("Marker Felt", Font.PLAIN, 30));
 		levelPanel.add(levelText, BorderLayout.WEST);
 		
 		JPanel Espacio = new JPanel();
-		Espacio.setBackground(new Color(69, 7, 134));
+		Espacio.setBackground(Color.BLACK);
 		levelPanel.add(Espacio, BorderLayout.NORTH);
 		
-		JButton btnOpciones = new JButton("-");
+		
+		ImageIcon imagenMenu = new ImageIcon("menu.png");
+		Image imagenRedimensionada = imagenMenu.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon imagenMenuRedimensionada = new ImageIcon(imagenRedimensionada);
+		JButton btnOpciones = new JButton(imagenMenuRedimensionada);
+		btnOpciones.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ImageIcon fondoOpciones = new ImageIcon("fondoOpciones.gif");
+				Object[] opciones = {"Salir", "Activar Sonido", "Mute"};
+		        int seleccion = JOptionPane.showOptionDialog(null, null, "Opciones", JOptionPane.DEFAULT_OPTION,
+		                JOptionPane.INFORMATION_MESSAGE, fondoOpciones, opciones, opciones[0]);
+		        switch(seleccion){
+			        case 0:
+		        		System.out.println("Fin");
+		        		System.exit(0);
+		        		break;
+	      
+		        	case 1: 
+		        		clip.start();
+		        		break;
+		        		
+		        	case 2:
+		        		clip.stop();
+		        		break;
+		        		
+		        	
+		        	case JOptionPane.CLOSED_OPTION: 
+		        		  System.out.println("Se ha cerrado el cuadro de diálogo.");
+		        		  break;
+		        }
+			}
+		});
+		btnOpciones.setContentAreaFilled(false);
+	    btnOpciones.setBorderPainted(false);
+		
 		levelPanel.add(btnOpciones, BorderLayout.EAST);
 		btnOpciones.setFocusable(false);
+		levelPanel.add(tiempoNum, BorderLayout.CENTER);
+		
+		tiempoNum.setHorizontalAlignment(SwingConstants.CENTER);
+		tiempoNum.setFont(new Font("Marker Felt", Font.PLAIN, 40));
+		tiempoNum.setForeground(new Color(87, 201, 0));
 		JPanel panel = new JPanel();
-		panel.setBackground(new Color(118, 228, 84));
+		panel.setBackground(Color.BLACK);
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
-		JButton btnNewButton = new JButton("Reiniciar");
-		btnNewButton.setForeground(new Color(9, 11, 49));
-		btnNewButton.setFont(new Font("Marker Felt", Font.PLAIN, 20));
-		btnNewButton.addActionListener(new ActionListener() {
+		ImageIcon imagenReiniciar = new ImageIcon("reiniciar.png");
+		JButton btnReiniciar = new JButton(imagenReiniciar);
+		
+		btnReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				reiniciar(juego);
 			}
 		});
-		panel.add(btnNewButton);
-		panel.add(tiempoNum);
+		btnReiniciar.setContentAreaFilled(false);
+		btnReiniciar.setBorderPainted(false);
 		
-		tiempoNum.setHorizontalAlignment(SwingConstants.CENTER);
-		tiempoNum.setFont(new Font("Marker Felt", Font.PLAIN, 40));
-		tiempoNum.setForeground(new Color(21, 102, 118));
+		panel.add(btnReiniciar);
 		tiempo.start();
+		
+		
 	}
 	
 	public void reiniciar(JPanel panel) {
@@ -176,15 +230,13 @@ public class Laberinto {
 		private static final long serialVersionUID = 1L;
 		
 		MyGraphics(){
-			setPreferredSize(new Dimension (800,650));
+			setPreferredSize(new Dimension (500,650));
 		}
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 	        
-	        //fondo
-			
 	        //Laberinto 
-	        g.setColor(Color.BLACK);
+	        g.setColor(new Color(118,228,84));
 	        for (int i = 0; i < matrizLaberinto().length; i++) {
 	            for (int j = 0; j < matrizLaberinto()[i].length; j++) {
 	                if (matrizLaberinto()[i][j] == 1) {
@@ -193,7 +245,7 @@ public class Laberinto {
 	                }
 	            }
 	        }
-	      
+	       
 	        //player
 	        g.setColor(new Color(118,228,84));
 	        g.fillOval(player_x,player_y,tamaño,tamaño);
@@ -261,8 +313,7 @@ public class Laberinto {
 	}
 	public void actualizarTiempo() {  //ACTUALIZA EL TIEMPO
 		String tiempo = (horas <= 9?"0":"")+ horas +":" +(minutos <= 9?"0":"")+ 
-				minutos +":"+(segundos <= 9?"0":"")+ segundos +":"+
-				(centecimas <= 9?"0":"")+ centecimas;
+				minutos +":"+(segundos <= 9?"0":"")+ segundos;
 		tiempoNum.setText(tiempo);
 	}
 	
@@ -304,4 +355,12 @@ public class Laberinto {
 			
 		}	
 	};
+	 
+    public void sonido() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+    	File archivoSonido = new File("sonido.wav");
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(archivoSonido);
+        clip = AudioSystem.getClip();
+        clip.open(audioStream);
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
+    }
 }
