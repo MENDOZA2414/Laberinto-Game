@@ -52,6 +52,7 @@ public class Laberinto {
 
 	private boolean mute = true;
 	private int centecimas = 0, segundos = 0, minutos = 0, horas = 	0;
+	private JLabel levelText;
 	
 
 	public static void main(String[] args) {
@@ -90,25 +91,7 @@ public class Laberinto {
 		frame.getContentPane().add(juego, BorderLayout.CENTER);
 		juego.add(new MyGraphics());
 		System.out.println(nivelAleatorio);
-		if(nivelAleatorio == 1) {
-       	 tamaño = 25;
-       	 ancho = 25;
-       	 alto = 25;
-       	 movimiento = 25;
-
-       	 player_x = 0;
-       	 player_y = 125;
-
-       }
-       if(nivelAleatorio == 2) {
-       	tamaño = 20;
-       	 ancho = 20;
-       	 alto = 20;
-       	 movimiento = 20;
-
-       	 player_x = 20;
-       	 player_y = 20;
-       }
+		asignarValores();
 		juego.addKeyListener(new KeyListener() {
 
 			@Override
@@ -117,34 +100,41 @@ public class Laberinto {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				System.out.println();
+				
 				last_prest = e.getKeyCode();
-	
-				if(last_prest == 87) { //ARRIBA
+				System.out.println("X: " + player_x + "\nY: " + player_y);
+				
+				if(last_prest == 87 && player_y!=0) { //ARRIBA
 					if(matrizLaberinto()[player_y/tamaño-1][player_x/tamaño]!=1) { 
 						player_y -= movimiento;
 					}
-						System.out.println("W");
+					
 				}
 				if(last_prest == 83 ) {  //ABAJO
 					if(matrizLaberinto()[player_y/tamaño+1][player_x/tamaño]!=1) { 
 						player_y += movimiento;
 					}
-					System.out.println("S");
+				
 				}
-				if(last_prest == 68 && player_x!=425) { //DERECHA (D)
-					if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1) { 
-						player_x += movimiento;
+				if(last_prest == 68 ) { //DERECHA (D)
+					if(nivelAleatorio == 1)
+					{
+						if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1 && player_x!=400) { 
+							player_x += movimiento;
+						}
 					}
-						System.out.println("D");
-						System.out.println(player_x);
-					
+					if(nivelAleatorio == 2)
+					{
+						if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1 && player_x!=400) { 
+							player_x += movimiento;
+						}
+					}
 				}
 				if(last_prest == 65 && player_x!=0) { //IZQUIERDA (A)
 					if(matrizLaberinto()[player_y/tamaño][player_x/tamaño-1]!=1) { 
 						player_x -= movimiento;
 					}
-					System.out.println("A");
+				
 				}
 				juego.repaint();
 			}
@@ -170,11 +160,12 @@ public class Laberinto {
 		
 		btnOpciones.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				tiempo.stop();
 				menu();
 			}
 		});
 		
-		JLabel levelText = new JLabel("  Level " + nivelAleatorio);
+		levelText = new JLabel("  Level " + nivelAleatorio);
 		levelText.setForeground(new Color(202, 14, 3));
 		levelText.setHorizontalAlignment(SwingConstants.CENTER);
 		levelText.setFont(new Font("Marker Felt", Font.PLAIN, 34));
@@ -183,19 +174,20 @@ public class Laberinto {
 		
 		tiempoNum.setHorizontalAlignment(SwingConstants.CENTER);
 		tiempoNum.setFont(new Font("Marker Felt", Font.PLAIN, 40));
-		tiempoNum.setForeground(new Color(87, 201, 0));
+		tiempoNum.setForeground(new Color(104, 175, 53));
 		btnOpciones.setContentAreaFilled(false);
 	    btnOpciones.setBorderPainted(false);
 		
 		levelPanel.add(btnOpciones);
 		btnOpciones.setFocusable(false);
 		JPanel panel = new JPanel();
-		panel.setBackground(Color.BLACK);
+		panel.setBackground(new Color(231, 237, 239));
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
 		ImageIcon imagenReiniciar = new ImageIcon("reiniciar.png");
 		panel.setLayout(new BorderLayout(0, 0));
 		JButton btnReiniciar = new JButton(imagenReiniciar);
+		panel.add(btnReiniciar, BorderLayout.NORTH);
 		
 		btnReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -204,14 +196,7 @@ public class Laberinto {
 		});
 		btnReiniciar.setContentAreaFilled(false);
 		btnReiniciar.setBorderPainted(false);
-		
-		panel.add(btnReiniciar, BorderLayout.NORTH);
-		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBackground(Color.BLACK);
-		panel.add(panel_1, BorderLayout.SOUTH);
 		tiempo.start();
-		
 		
 	}
 	
@@ -249,14 +234,43 @@ public class Laberinto {
         		System.exit(0);
         		break;
         }
+        tiempo.start();
 	}
 	
+	public void asignarValores() {
+		if(nivelAleatorio == 1) {
+	       	 tamaño = 25;
+	       	 ancho = 25;
+	       	 alto = 25;
+	       	 movimiento = 25;
+
+	       	 player_x = 0;
+	       	 player_y = 125;
+
+	       }
+	       if(nivelAleatorio == 2) {
+	         tamaño = 20;
+	       	 ancho = 20;
+	       	 alto = 20;
+	       	 movimiento = 20;
+
+	       	 player_x = 20;
+	       	 player_y = 20;
+	       }
+	}
 	public void reiniciar(JPanel panel) {
-		player_x = 0;
-		player_y = 125;
+		reiniciarTiempo();
+		panel.removeAll();
+		
+		nivelAleatorio = random.nextInt(2) + 1;
+		asignarValores();
+		levelText.setText("  Level " + nivelAleatorio);
+		panel.add(new MyGraphics());
 		panel.setFocusable(true);
 		panel.requestFocus();
 		panel.repaint();
+		panel.revalidate();
+		tiempo.start();
 	}
 	
 	public class MyGraphics extends JComponent {
