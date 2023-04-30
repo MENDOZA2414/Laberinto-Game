@@ -17,18 +17,32 @@ import java.awt.event.ActionEvent;
 import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 
 public class Laberinto {
 	
 	private JFrame frame;
-    private int tamaño = 40;
-    private int ancho = 40;
-    private int alto = 40;
-    private int movimiento = 40;
+	private JLabel tiempoNum = new JLabel("00:00:00:00");;
+	/* LABERINTO 1
+	private int tamaño = 25;
+    private int ancho = 25;
+    private int alto = 25;
+    private int movimiento = 25;
     
-	public int player_x = 40;
-	public int player_y = 40;
+	public int player_x = 0;
+	public int player_y = 125;
+	public int last_prest;*/
+    private int tamaño = 20;
+    private int ancho = 20;
+    private int alto = 20;
+    private int movimiento = 20;
+    
+	public int player_x = 20;
+	public int player_y = 20;
 	public int last_prest;
+	private Timer tiempo;
+	
+	private int centecimas = 0, segundos = 0, minutos = 0, horas = 	0;
 	
 
 	public static void main(String[] args) {
@@ -46,9 +60,11 @@ public class Laberinto {
 	
 	public Laberinto() {
 		initialize();
+		
 	}
 
 	private void initialize() {
+		tiempo = new Timer(10,accion);
 		frame = new JFrame();
 		frame.setBounds(0, 0, 855, 680);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -83,14 +99,15 @@ public class Laberinto {
 					}
 					System.out.println("S");
 				}
-				if(last_prest == 68 ) { //DERECHA (D)
+				if(last_prest == 68 && player_x!=425) { //DERECHA (D)
 					if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1) { 
 						player_x += movimiento;
 					}
 						System.out.println("D");
+						System.out.println(player_x);
 					
 				}
-				if(last_prest == 65) { //IZQUIERDA (A)
+				if(last_prest == 65 && player_x!=0) { //IZQUIERDA (A)
 					if(matrizLaberinto()[player_y/tamaño][player_x/tamaño-1]!=1) { 
 						player_x -= movimiento;
 					}
@@ -138,11 +155,17 @@ public class Laberinto {
 			}
 		});
 		panel.add(btnNewButton);
+		panel.add(tiempoNum);
+		
+		tiempoNum.setHorizontalAlignment(SwingConstants.CENTER);
+		tiempoNum.setFont(new Font("Marker Felt", Font.PLAIN, 40));
+		tiempoNum.setForeground(new Color(21, 102, 118));
+		tiempo.start();
 	}
 	
 	public void reiniciar(JPanel panel) {
-		player_x = 40;
-		player_y = 40;
+		player_x = 0;
+		player_y = 125;
 		panel.setFocusable(true);
 		panel.requestFocus();
 		panel.repaint();
@@ -153,7 +176,7 @@ public class Laberinto {
 		private static final long serialVersionUID = 1L;
 		
 		MyGraphics(){
-			setPreferredSize(new Dimension (650,500));
+			setPreferredSize(new Dimension (800,650));
 		}
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
@@ -170,7 +193,7 @@ public class Laberinto {
 	                }
 	            }
 	        }
-	        
+	      
 	        //player
 	        g.setColor(new Color(118,228,84));
 	        g.fillOval(player_x,player_y,tamaño,tamaño);
@@ -181,20 +204,104 @@ public class Laberinto {
 	}
 	
 	public int[][] matrizLaberinto() {
-		int[][] laberinto = {
-			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-			    {1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
-			    {1, 0, 1, 0, 1, 0, 1, 1, 0, 1},
-			    {1, 0, 1, 0, 0, 0, 0, 1, 0, 1},
-			    {1, 0, 1, 1, 1, 1, 0, 1, 0, 1},
-			    {1, 0, 0, 0, 0, 1, 0, 1, 0, 1},
-			    {1, 0, 1, 1, 0, 0, 0, 1, 0, 1},
-			    {1, 0, 1, 0, 0, 1, 0, 1, 0, 1},
-			    {1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
-			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+		int[][] laberinto1 = {
+			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+			    {1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
+			    {1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1},
+			    {1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1},
+			    {1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1},
+			    {0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1},
+			    {1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1},
+			    {1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1},
+			    {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1},
+			    {1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1},
+			    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1},
+			    {1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1},
+			    {1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1},
+			    {1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1},
+			    {1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1},
+			    {1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1},
+			    {1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0},
+			    {1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1},
+			    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+			    
+			};
+		int[][] laberinto2 = {
+				{1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+			    {1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1},
+			    {1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1},
+			    {1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+			    {1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
+			    {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1},
+			    {1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+			    {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1},
+			    {1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+			    {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
+			    {1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1},
+			    {1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1},
+			    {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1},
+			    {1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1},
+			    {1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1},
+			    {1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
+			    {1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1},
+			    {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1},
+			    {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1},
+			    {1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1},
+			    {1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1},
+			    {1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+			    {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+			    {1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0},
+			    {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1},
+			    {1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 			};
 
-		return laberinto;
+		return laberinto2;
+	}
+	public void actualizarTiempo() {  //ACTUALIZA EL TIEMPO
+		String tiempo = (horas <= 9?"0":"")+ horas +":" +(minutos <= 9?"0":"")+ 
+				minutos +":"+(segundos <= 9?"0":"")+ segundos +":"+
+				(centecimas <= 9?"0":"")+ centecimas;
+		tiempoNum.setText(tiempo);
 	}
 	
+	public void reiniciarTiempo() {  //REINICIAR EL TIEMPO
+		if(tiempo.isRunning()) {
+			tiempo.stop();
+		}
+		centecimas = 0;
+		segundos = 0;
+		minutos = 0;
+		horas = 0;
+		
+		actualizarTiempo();
+		
+	}
+	private ActionListener accion = new ActionListener() {  //HACE LA FUNCION DE UN CRONOMETRO
+		public void actionPerformed(ActionEvent e) {
+			centecimas++;
+			
+			if(centecimas == 100) {
+				segundos++;
+				centecimas = 0;
+			}
+			
+			if(segundos == 60) {
+				minutos++;
+				segundos = 0;
+			}
+			
+			if(minutos == 60) {
+				horas++;
+				minutos = 0;
+			}
+			
+			if(horas == 24) {
+				horas = 0;
+			}
+			actualizarTiempo();	
+			
+		}	
+	};
 }
