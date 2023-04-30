@@ -28,31 +28,29 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
+import java.awt.GridLayout;
+import java.util.Random;
 
 public class Laberinto {
 	
 	private JFrame frame;
 	private JLabel tiempoNum = new JLabel("00:00:00");;
-	/* LABERINTO 1
-	private int tamaño = 25;
-    private int ancho = 25;
-    private int alto = 25;
-    private int movimiento = 25;
+	
+    private int tamaño;
+    private int ancho;
+    private int alto;
+    private int movimiento;
     
-	public int player_x = 0;
-	public int player_y = 125;
-	public int last_prest;*/
-    private int tamaño = 20;
-    private int ancho = 20;
-    private int alto = 20;
-    private int movimiento = 20;
-    
-	public int player_x = 20;
-	public int player_y = 20;
+	public int player_x;
+	public int player_y;
 	public int last_prest;
 	private Timer tiempo;
 	private  Clip clip;
-	
+	private String sonido = "silencio.png";
+	private Random random = new Random();
+	private int nivelAleatorio = random.nextInt(2) + 1;
+
+	private boolean mute = true;
 	private int centecimas = 0, segundos = 0, minutos = 0, horas = 	0;
 	
 
@@ -82,15 +80,35 @@ public class Laberinto {
 	private void initialize() {
 		tiempo = new Timer(10,accion);
 		frame = new JFrame();
-		frame.setBounds(0, 0, 580, 750);
+		frame.setBounds(0, 0, 525, 750);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
+		frame.setResizable(false);
 		
 		JPanel juego = new JPanel();
 		juego.setBackground(Color.BLACK);
 		frame.getContentPane().add(juego, BorderLayout.CENTER);
 		juego.add(new MyGraphics());
-		
+		System.out.println(nivelAleatorio);
+		if(nivelAleatorio == 1) {
+       	 tamaño = 25;
+       	 ancho = 25;
+       	 alto = 25;
+       	 movimiento = 25;
+
+       	 player_x = 0;
+       	 player_y = 125;
+
+       }
+       if(nivelAleatorio == 2) {
+       	tamaño = 20;
+       	 ancho = 20;
+       	 alto = 20;
+       	 movimiento = 20;
+
+       	 player_x = 20;
+       	 player_y = 20;
+       }
 		juego.addKeyListener(new KeyListener() {
 
 			@Override
@@ -142,65 +160,41 @@ public class Laberinto {
 		JPanel levelPanel = new JPanel();
 		levelPanel.setBackground(Color.BLACK);
 		frame.getContentPane().add(levelPanel, BorderLayout.NORTH);
-		levelPanel.setLayout(new BorderLayout(0, 0));
-		
-		JLabel levelText = new JLabel("  Level 1");
-		levelText.setForeground(new Color(202, 14, 3));
-		levelText.setHorizontalAlignment(SwingConstants.RIGHT);
-		levelText.setFont(new Font("Marker Felt", Font.PLAIN, 30));
-		levelPanel.add(levelText, BorderLayout.WEST);
-		
-		JPanel Espacio = new JPanel();
-		Espacio.setBackground(Color.BLACK);
-		levelPanel.add(Espacio, BorderLayout.NORTH);
+		levelPanel.setLayout(new GridLayout(0, 3, 0, 0));
 		
 		
 		ImageIcon imagenMenu = new ImageIcon("menu.png");
 		Image imagenRedimensionada = imagenMenu.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         ImageIcon imagenMenuRedimensionada = new ImageIcon(imagenRedimensionada);
 		JButton btnOpciones = new JButton(imagenMenuRedimensionada);
+		
 		btnOpciones.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ImageIcon fondoOpciones = new ImageIcon("fondoOpciones.gif");
-				Object[] opciones = {"Salir", "Activar Sonido", "Mute"};
-		        int seleccion = JOptionPane.showOptionDialog(null, null, "Opciones", JOptionPane.DEFAULT_OPTION,
-		                JOptionPane.INFORMATION_MESSAGE, fondoOpciones, opciones, opciones[0]);
-		        switch(seleccion){
-			        case 0:
-		        		System.out.println("Fin");
-		        		System.exit(0);
-		        		break;
-	      
-		        	case 1: 
-		        		clip.start();
-		        		break;
-		        		
-		        	case 2:
-		        		clip.stop();
-		        		break;
-		        		
-		        	
-		        	case JOptionPane.CLOSED_OPTION: 
-		        		  System.out.println("Se ha cerrado el cuadro de diálogo.");
-		        		  break;
-		        }
+				menu();
 			}
 		});
-		btnOpciones.setContentAreaFilled(false);
-	    btnOpciones.setBorderPainted(false);
 		
-		levelPanel.add(btnOpciones, BorderLayout.EAST);
-		btnOpciones.setFocusable(false);
-		levelPanel.add(tiempoNum, BorderLayout.CENTER);
+		JLabel levelText = new JLabel("  Level " + nivelAleatorio);
+		levelText.setForeground(new Color(202, 14, 3));
+		levelText.setHorizontalAlignment(SwingConstants.CENTER);
+		levelText.setFont(new Font("Marker Felt", Font.PLAIN, 34));
+		levelPanel.add(levelText);
+		levelPanel.add(tiempoNum);
 		
 		tiempoNum.setHorizontalAlignment(SwingConstants.CENTER);
 		tiempoNum.setFont(new Font("Marker Felt", Font.PLAIN, 40));
 		tiempoNum.setForeground(new Color(87, 201, 0));
+		btnOpciones.setContentAreaFilled(false);
+	    btnOpciones.setBorderPainted(false);
+		
+		levelPanel.add(btnOpciones);
+		btnOpciones.setFocusable(false);
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.BLACK);
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
 		ImageIcon imagenReiniciar = new ImageIcon("reiniciar.png");
+		panel.setLayout(new BorderLayout(0, 0));
 		JButton btnReiniciar = new JButton(imagenReiniciar);
 		
 		btnReiniciar.addActionListener(new ActionListener() {
@@ -211,10 +205,50 @@ public class Laberinto {
 		btnReiniciar.setContentAreaFilled(false);
 		btnReiniciar.setBorderPainted(false);
 		
-		panel.add(btnReiniciar);
+		panel.add(btnReiniciar, BorderLayout.NORTH);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBackground(Color.BLACK);
+		panel.add(panel_1, BorderLayout.SOUTH);
 		tiempo.start();
 		
 		
+	}
+	
+	public void menu() {
+		ImageIcon iconoSonido = new ImageIcon(sonido);
+		ImageIcon iconoSalir = new ImageIcon("salir.png");
+		ImageIcon iconoAtras = new ImageIcon("atras.png");
+		
+		JLabel mensaje = new JLabel("         MENU");
+		mensaje.setForeground(new Color(202, 14, 3));
+		mensaje.setFont(new Font("Marker Felt", Font.PLAIN, 35));
+		
+		Object[] opciones = {iconoAtras, iconoSonido, iconoSalir};
+        int seleccion = JOptionPane.showOptionDialog(null, mensaje, "Ve detrás tuyo", JOptionPane.NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+        
+        switch(seleccion){
+        	case 0:
+        		break;
+        		
+	        case 1:
+	        	if(mute) {
+        			clip.stop();
+					sonido = "volumen.png";
+					mute = false;
+				}
+        		else {
+        			clip.start();
+        			sonido = "silencio.png";
+        			mute = true;
+        		}
+        		break;
+  
+        	case 2: 
+        		System.exit(0);
+        		break;
+        }
 	}
 	
 	public void reiniciar(JPanel panel) {
@@ -230,11 +264,14 @@ public class Laberinto {
 		private static final long serialVersionUID = 1L;
 		
 		MyGraphics(){
-			setPreferredSize(new Dimension (500,650));
+			if(nivelAleatorio == 2) {
+				setPreferredSize(new Dimension (430,650));
+			}else {
+				setPreferredSize(new Dimension (450,650));
+			}
 		}
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-	        
 	        //Laberinto 
 	        g.setColor(new Color(118,228,84));
 	        for (int i = 0; i < matrizLaberinto().length; i++) {
@@ -247,15 +284,23 @@ public class Laberinto {
 	        }
 	       
 	        //player
-	        g.setColor(new Color(118,228,84));
-	        g.fillOval(player_x,player_y,tamaño,tamaño);
 	        g.setColor(Color.white);
+	        g.fillOval(player_x,player_y,tamaño,tamaño);
+	        g.setColor(Color.red);
 	        g.drawOval(player_x,player_y,tamaño,tamaño);
+
+	        g.setColor(Color.BLACK);
+	        g.fillOval(player_x+12, player_y+4, 7, 7);
+	        g.fillOval(player_x+3, player_y+4, 5, 5);
+	    
+	        g.setColor(Color.red);
+	        g.drawArc(player_x+6, player_y+10, 12, 7, 0, -180);
 	     
 		}
 	}
 	
 	public int[][] matrizLaberinto() {
+		
 		int[][] laberinto1 = {
 			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 			    {1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
@@ -308,8 +353,12 @@ public class Laberinto {
 			    {1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 			};
-
-		return laberinto2;
+		if(nivelAleatorio == 1) {
+			return laberinto1;
+		}
+		else {
+			return laberinto2;
+		}
 	}
 	public void actualizarTiempo() {  //ACTUALIZA EL TIEMPO
 		String tiempo = (horas <= 9?"0":"")+ horas +":" +(minutos <= 9?"0":"")+ 
