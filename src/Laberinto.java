@@ -19,14 +19,18 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 public class Laberinto {
+	
 	private JFrame frame;
-	public int player_x = 150;
-	public int player_y = 80;
+    private int tamaño = 40;
+    private int ancho = 40;
+    private int alto = 40;
+    private int movimiento = 40;
+    
+	public int player_x = 40;
+	public int player_y = 40;
 	public int last_prest;
-	private Rect r,p;
-	/**
-	 * Launch the application.
-	 */
+	
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -39,21 +43,14 @@ public class Laberinto {
 			}
 		});
 	}
-	/**
-	 * Create the application.
-	 */
+	
 	public Laberinto() {
 		initialize();
-		
 	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
 
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(0, 0, 550, 680);
+		frame.setBounds(0, 0, 855, 680);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		
@@ -67,39 +64,44 @@ public class Laberinto {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				//System.out.println(e.getKeyChar());
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				System.out.println();
 				last_prest = e.getKeyCode();
-				
-				if(!r.colision(p)) {
-					if(last_prest == 87 && player_y > 15) {
-						player_y -=15;
+	
+				if(last_prest == 87) { //ARRIBA
+					if(matrizLaberinto()[player_y/tamaño-1][player_x/tamaño]!=1) { 
+						player_y -= movimiento;
 					}
-					if(last_prest == 83 && player_y < 650) {
-						player_y +=15;
+						System.out.println("W");
+				}
+				if(last_prest == 83 ) {  //ABAJO
+					if(matrizLaberinto()[player_y/tamaño+1][player_x/tamaño]!=1) { 
+						player_y += movimiento;
 					}
-					if(last_prest == 68 && player_x < 575) {
-						player_x +=15;
+					System.out.println("S");
+				}
+				if(last_prest == 68 ) { //DERECHA (D)
+					if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1) { 
+						player_x += movimiento;
 					}
-					if(last_prest == 65 && player_x > 25) {
-						player_x -=15;
-					}
-					juego.repaint();
+						System.out.println("D");
 					
 				}
-				else
-				{
-					System.out.println("Colisionaste");
+				if(last_prest == 65) { //IZQUIERDA (A)
+					if(matrizLaberinto()[player_y/tamaño][player_x/tamaño-1]!=1) { 
+						player_x -= movimiento;
+					}
+					System.out.println("A");
 				}
+				juego.repaint();
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
 			}
 		});
 		
@@ -132,14 +134,18 @@ public class Laberinto {
 		btnNewButton.setFont(new Font("Marker Felt", Font.PLAIN, 20));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				player_x = 150;
-				player_y = 80;
-				juego.setFocusable(true);
-				juego.requestFocus();
-				juego.repaint();
+				reiniciar(juego);
 			}
 		});
 		panel.add(btnNewButton);
+	}
+	
+	public void reiniciar(JPanel panel) {
+		player_x = 40;
+		player_y = 40;
+		panel.setFocusable(true);
+		panel.requestFocus();
+		panel.repaint();
 	}
 	
 	public class MyGraphics extends JComponent {
@@ -153,51 +159,42 @@ public class Laberinto {
 			super.paintComponent(g);
 	        
 	        //fondo
-			g.setColor(new Color(9,11,52));
-	        g.fillRect(120, 50, 400, 500); 
-	        
-	        //player
-	        r = new Rect(player_x, player_y, 30, 30, new Color(118,228,84));
-	        g.setColor(r.c);
-	        g.fillOval(r.x,r.y, r.w, r.h);
-	     
-	        p = new Rect(300, 60, 40, 200, new Color(100,30,20));
-	        g.setColor(p.c);
-	        g.fillRect(p.x,p.y, p.w, p.h); 
-	        
-	        if(r.colision(p)) {
-	        	System.out.println(r.colision(p));
+			
+	        //Laberinto 
+	        g.setColor(Color.BLACK);
+	        for (int i = 0; i < matrizLaberinto().length; i++) {
+	            for (int j = 0; j < matrizLaberinto()[i].length; j++) {
+	                if (matrizLaberinto()[i][j] == 1) {
+	                	
+	                    g.fillRect(j * tamaño, i * tamaño, ancho, alto);
+	                }
+	            }
 	        }
 	        
+	        //player
+	        g.setColor(new Color(118,228,84));
+	        g.fillOval(player_x,player_y,tamaño,tamaño);
+	        g.setColor(Color.white);
+	        g.drawOval(player_x,player_y,tamaño,tamaño);
+	     
 		}
 	}
 	
-	public class Rect {
-		int x = 0;
-		int y = 0;
-		int w = 0;
-		int h = 0;
-		Color c = Color.black;
-		
-		Rect(int x, int y, int w, int h, Color c){
-			this.x = x;
-			this.y = y;
-			this.w = w;
-			this.h = h;
-			this.c = c;
-		}
-		
-		public boolean colision(Rect target) {
-			if(this.x < target.x + target.w &&
-			   this.x + this.w > target.x &&
-			   this.y < target.y + target.h &&
-			   this.y + this.h > target.y) {
-				
-				return true;
-				
-			}
-			return false;
-		}
+	public int[][] matrizLaberinto() {
+		int[][] laberinto = {
+			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+			    {1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+			    {1, 0, 1, 0, 1, 0, 1, 1, 0, 1},
+			    {1, 0, 1, 0, 0, 0, 0, 1, 0, 1},
+			    {1, 0, 1, 1, 1, 1, 0, 1, 0, 1},
+			    {1, 0, 0, 0, 0, 1, 0, 1, 0, 1},
+			    {1, 0, 1, 1, 0, 0, 0, 1, 0, 1},
+			    {1, 0, 1, 0, 0, 1, 0, 1, 0, 1},
+			    {1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+			};
+
+		return laberinto;
 	}
 	
 }
