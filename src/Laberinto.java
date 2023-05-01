@@ -30,6 +30,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import java.awt.GridLayout;
 import java.util.Random;
+import java.awt.FlowLayout;
 
 public class Laberinto {
 	
@@ -119,13 +120,15 @@ public class Laberinto {
 				if(last_prest == 68 ) { //DERECHA (D)
 					if(nivelAleatorio == 1)
 					{
-						if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1 && player_x!=400) { 
+						if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1 && 
+								matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=4) { 
 							player_x += movimiento;
 						}
 					}
 					if(nivelAleatorio == 2)
 					{
-						if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1 && player_x!=400) { 
+						if(matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=1 && 
+								matrizLaberinto()[player_y/tamaño][player_x/tamaño+1]!=4) { 
 							player_x += movimiento;
 						}
 					}
@@ -136,7 +139,12 @@ public class Laberinto {
 					}
 				
 				}
+				if(nivelAleatorio == 1) {
+					
+				}
 				juego.repaint();
+				juego.revalidate();
+				completado(juego);
 			}
 
 			@Override
@@ -174,20 +182,20 @@ public class Laberinto {
 		
 		tiempoNum.setHorizontalAlignment(SwingConstants.CENTER);
 		tiempoNum.setFont(new Font("Marker Felt", Font.PLAIN, 40));
-		tiempoNum.setForeground(new Color(104, 175, 53));
+		tiempoNum.setForeground(new Color(176, 180, 182));
 		btnOpciones.setContentAreaFilled(false);
 	    btnOpciones.setBorderPainted(false);
 		
 		levelPanel.add(btnOpciones);
 		btnOpciones.setFocusable(false);
 		JPanel panel = new JPanel();
-		panel.setBackground(new Color(231, 237, 239));
+		panel.setBackground(new Color(26, 26, 26));
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
 		ImageIcon imagenReiniciar = new ImageIcon("reiniciar.png");
-		panel.setLayout(new BorderLayout(0, 0));
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		JButton btnReiniciar = new JButton(imagenReiniciar);
-		panel.add(btnReiniciar, BorderLayout.NORTH);
+		panel.add(btnReiniciar);
 		
 		btnReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -210,7 +218,7 @@ public class Laberinto {
 		mensaje.setFont(new Font("Marker Felt", Font.PLAIN, 35));
 		
 		Object[] opciones = {iconoAtras, iconoSonido, iconoSalir};
-        int seleccion = JOptionPane.showOptionDialog(null, mensaje, "Ve detrás tuyo", JOptionPane.NO_OPTION,
+        int seleccion = JOptionPane.showOptionDialog(null, mensaje, "Mira detrás tuyo", JOptionPane.NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
         
         switch(seleccion){
@@ -244,7 +252,7 @@ public class Laberinto {
 	       	 alto = 25;
 	       	 movimiento = 25;
 
-	       	 player_x = 0;
+	       	 player_x = 25;
 	       	 player_y = 125;
 
 	       }
@@ -257,6 +265,67 @@ public class Laberinto {
 	       	 player_x = 20;
 	       	 player_y = 20;
 	       }
+	}
+	public void completado(JPanel panel) {
+		if(player_x == 425 && player_y == 400 || player_x == 400 && player_y == 460){
+			tiempo.stop();
+			
+			ImageIcon iconoSonido = new ImageIcon(sonido);
+			ImageIcon iconoSalir = new ImageIcon("salir.png");
+			ImageIcon iconoAtras = new ImageIcon("atras.png");
+			
+			JLabel mensaje = new JLabel("         FELICIDADES ENCONTRASTE LA SALIDA - Tiempo: " + tiempoNum.getText());
+			mensaje.setForeground(new Color(202, 14, 3));
+			mensaje.setFont(new Font("Marker Felt", Font.PLAIN, 35));
+			
+			Object[] opciones = {iconoAtras, iconoSonido, iconoSalir};
+	        int seleccion = JOptionPane.showOptionDialog(null, mensaje, "Está en tí", JOptionPane.NO_OPTION,
+	                JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+	        
+	        switch(seleccion){
+	        	case 0:
+	        		break;
+	        		
+		        case 1:
+		        	if(mute) {
+	        			clip.stop();
+						sonido = "volumen.png";
+						mute = false;
+					}
+	        		else {
+	        			clip.start();
+	        			sonido = "silencio.png";
+	        			mute = true;
+	        		}
+	        		break;
+	  
+	        	case 2: 
+	        		System.exit(0);
+	        		break;
+	        }
+	        siguienteNivel(panel);
+			
+		}
+	}
+	public void siguienteNivel(JPanel panel) {
+		reiniciarTiempo();
+		panel.removeAll();
+		
+		if(nivelAleatorio == 1) {
+			nivelAleatorio = 2;
+		}
+		else if(nivelAleatorio == 2){
+			nivelAleatorio = 1;
+		}
+		asignarValores();
+		levelText.setText("  Level " + nivelAleatorio);
+		panel.add(new MyGraphics());
+		panel.setFocusable(true);
+		panel.requestFocus();
+		panel.repaint();
+		panel.revalidate();
+		
+		tiempo.start();
 	}
 	public void reiniciar(JPanel panel) {
 		reiniciarTiempo();
@@ -287,12 +356,21 @@ public class Laberinto {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 	        //Laberinto 
-	        g.setColor(new Color(118,228,84));
+	        
 	        for (int i = 0; i < matrizLaberinto().length; i++) {
 	            for (int j = 0; j < matrizLaberinto()[i].length; j++) {
 	                if (matrizLaberinto()[i][j] == 1) {
-	                	
+	                	g.setColor(new Color(176, 180, 182));
 	                    g.fillRect(j * tamaño, i * tamaño, ancho, alto);
+	                }
+	                
+	                if(matrizLaberinto()[i][j] == 2) {
+	                	g.setColor(new Color(202, 14, 3));
+	                	g.fillRect(j * tamaño, i * tamaño, ancho, alto);
+	                }
+	                if(matrizLaberinto()[i][j] == 3) {
+	                	g.setColor(new Color(118,228,84));
+	                	g.fillRect(j * tamaño, i * tamaño, ancho, alto);
 	                }
 	            }
 	        }
@@ -321,7 +399,7 @@ public class Laberinto {
 			    {1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1},
 			    {1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1},
 			    {1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1},
-			    {0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1},
+			    {3, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1},
 			    {1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1},
 			    {1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1},
 			    {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1},
@@ -332,14 +410,14 @@ public class Laberinto {
 			    {1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1},
 			    {1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1},
 			    {1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1},
-			    {1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0},
+			    {1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 2,4},
 			    {1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1},
 			    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 			    
 			};
 		int[][] laberinto2 = {
-				{1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+				{1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 			    {1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1},
 			    {1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1},
 			    {1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
@@ -362,7 +440,7 @@ public class Laberinto {
 			    {1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1},
 			    {1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
 			    {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-			    {1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0},
+			    {1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 2,4},
 			    {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1},
 			    {1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 			    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
