@@ -102,7 +102,6 @@ public class Laberinto {
 			public void keyPressed(KeyEvent e) { //VERIFICA EL MOVIMIENTO DE LAS TECLAS
 				
 				last_prest = e.getKeyCode();
-				System.out.println("X: " + player_x + "\nY: " + player_y);
 				
 				if(last_prest == 87 && player_y!=0) { //ARRIBA (W)
 					if(matrizLaberinto()[player_y/tamaño-1][player_x/tamaño]!=1) { 
